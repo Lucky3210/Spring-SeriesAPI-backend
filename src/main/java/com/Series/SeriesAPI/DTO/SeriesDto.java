@@ -33,8 +33,6 @@ public class SeriesDto {
     @NotBlank(message = "Please provide a poster url")
     private String posterUrl;
 
-    public SeriesDto(Integer seriesId, String title, String director, Set<String> seriesCast, Integer releaseYear, String studio, String poster, String posterUrl) {
-    }
 
     public Integer getSeriesId() {
         return seriesId;
