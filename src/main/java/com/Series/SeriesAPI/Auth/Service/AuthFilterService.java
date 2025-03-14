@@ -64,7 +64,7 @@ public class AuthFilterService extends OncePerRequestFilter {
                 // since the context from SecurityContextHolder was null, we need to set it.
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-                // after we set the SecurityContextHolder authentication to this authentication token it means teh user is authenticated
+                // after we set the SecurityContextHolder authentication to this authentication token it means the user is authenticated
             }
         }
 

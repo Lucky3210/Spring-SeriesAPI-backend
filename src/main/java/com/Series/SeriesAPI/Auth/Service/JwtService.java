@@ -18,7 +18,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "";
+    private static final String SECRET_KEY = "3TAY/ml4UhUmUwhWQG8IgWY3C/KDb60L0tZOvNvpo+o=";
 
     // extract username from JWT
     public String extractUsername(String token){
@@ -46,6 +46,9 @@ public class JwtService {
 
         // decode Secret key
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        if (keyBytes.length < 32) { // 32 bytes = 256 bits
+            throw new IllegalArgumentException("Invalid key length! Key must be at least 256 bits for HS256.");
+        }
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

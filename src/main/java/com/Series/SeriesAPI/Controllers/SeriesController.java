@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +35,8 @@ public class SeriesController {
         return objectMapper.readValue(seriesDtoObj, SeriesDto.class);
 
     }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/addSeries")
     public ResponseEntity<SeriesDto> addSeriesHandler(@RequestPart MultipartFile file,
                                                       @RequestPart String seriesDto) throws IOException, EmptyFileException {
