@@ -9,5 +9,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     // from the appconfig bean, and even here the userRepository don't have the method of findByUsername, only findById,
     // so we create a function of finding the username(since we are logging in through the username). remember the convention
-    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String username);
 }

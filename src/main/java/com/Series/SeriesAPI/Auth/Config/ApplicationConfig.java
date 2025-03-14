@@ -26,7 +26,7 @@ public class ApplicationConfig {
     // This userdetailsservice is used also as a user DAO(data access object) to be used in the authprovider
     @Bean
     public UserDetailsService userDetailsService(){
-        return username -> userRepository.findByUsername(username)
+        return username -> userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
     }
 
