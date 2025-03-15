@@ -39,7 +39,7 @@ public class Series {
 
     @Column(nullable = false)
     @NotBlank(message = "Please provide series poster")
-    private String poster;
+    private String poster;      // series image to be uploaded(represented by the name of the image)
 
     public Integer getSeriesId() {
         return seriesId;

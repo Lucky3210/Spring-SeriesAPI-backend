@@ -43,7 +43,7 @@ public class RefreshTokenService {
             // once we get our refresh token we need to save it to the refresh token repo
             refreshTokenRepository.save(refreshToken);
         }
-        // if it not empty then we return the refresh token
+        // if it is not empty then we return the refresh token either ways
         return refreshToken;
     }
 

@@ -53,7 +53,7 @@ public class SeriesServiceImpl implements SeriesService{
         String uploadedFileName = fileService.uploadFile(path, file);
         seriesDto.setPoster(uploadedFileName);
 
-        // Then, we will map the seriesDto to object in order for it to be save into the db.
+        // Then, we will map the seriesDto to Series object in order for it to be save into the db.
         Series series = new Series();
         series.setSeriesId(seriesDto.getSeriesId());
         series.setTitle(seriesDto.getTitle());
@@ -69,6 +69,7 @@ public class SeriesServiceImpl implements SeriesService{
         /*
          After it is being saved into the db, we want to return the seriesDto as a response object, but in the seriesDto we have a field posterUrl which is an extra field
          therefore we want to generate the posterUrl, such that when a user clicks on the url, it shows the image.
+         The posterUrl is synonymous to the url for getting file(in the FileController) - localhost:8080/file/{filename}
         */
         String posterUrl = baseUrl + "/file/" + uploadedFileName;
 
@@ -92,7 +93,7 @@ public class SeriesServiceImpl implements SeriesService{
         Series series = seriesRepository.findById(seriesId).orElseThrow(() -> new SeriesNotFoundException("Series with id" + seriesId + " not found"));
 
 
-        // get the posterUrl from the poster
+        // get the posterUrl from the poster(series.getPoster() returns the poster/image name, from there we can formulate the posterUrl)
         String posterUrl = baseUrl + "/file/" + series.getPoster();
 
         // add the posterUrl and return it as a dto
@@ -156,7 +157,7 @@ public class SeriesServiceImpl implements SeriesService{
         // next we set seriesDto poster value according to the above setup
         seriesDto.setPoster(fileName);      // whether the file is null or not null we set it to the fileName
 
-        // map it to series obj, and save the series obj
+        // map it to series obj, in order to save the series obj to the db
         Series seriesObj = new Series();
         seriesObj.setSeriesId(series.getSeriesId());    // notice we set the id to what we passed in initially
         seriesObj.setTitle(seriesDto.getTitle());
@@ -235,6 +236,7 @@ public class SeriesServiceImpl implements SeriesService{
         @Override
     public SeriesPageResponse getAllSeriesWithPaginationAndSorting(Integer pageNumber, Integer pageSize, String sortBy, String direction) {
 
+        // we are sorting by seriesId(sortBy) in ascending order(direction)
             Sort sort = direction.equalsIgnoreCase("asc")?
                     Sort.by(sortBy).ascending():
                     Sort.by(sortBy).descending();
@@ -242,7 +244,7 @@ public class SeriesServiceImpl implements SeriesService{
             // Similar implementation as that of only pagination
             Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);       // returns a pageable object that specifies the pageNumber and pageSize. We add an extra parameter.
 
-            // we need this pageable object because when we call the finAll method as below, it takes in an argument of pageable
+            // we need this pageable object because when we call the findAll method as below, it takes in an argument of pageable
             Page<Series> seriesPages = seriesRepository.findAll(pageable);     // whatever records or field that are coming from the database will be paginated
             List<Series> series = seriesPages.getContent();     // returns the list of all the series
 

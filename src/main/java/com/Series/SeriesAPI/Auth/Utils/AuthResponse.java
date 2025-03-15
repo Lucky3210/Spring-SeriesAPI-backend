@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AuthResponse {
 
-    // for all the request we want to our authentication response to be the refresh and access token
+    // for all the request(login, register, refreshTokenRequest) we want to our authentication response to be the refresh and access token
     private String accessToken;
     private String refreshToken;
 }

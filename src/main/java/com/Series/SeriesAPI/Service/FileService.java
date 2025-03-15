@@ -9,7 +9,7 @@ import java.io.InputStream;
 
 public interface  FileService {
 
-    // path: the path for which we are uploading the file
+    // path: the path/directory for which we are uploading the file
     // MultipartFile: is used in springboot for files when we are dealing in a restful way
     // The method upload/save the poster image(file) into the server file system
     String uploadFile(String path, MultipartFile file) throws IOException;

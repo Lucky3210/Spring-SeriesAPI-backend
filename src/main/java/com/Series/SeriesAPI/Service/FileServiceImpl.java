@@ -19,7 +19,7 @@ public class FileServiceImpl implements FileService{
         String fileName = file.getOriginalFilename();
 
         // get the file path(we append the directory[what we set in the app.prop file] to the file name)
-        // File.separator tells SB that the two strings should be concatenated
+        // File.separator tells SB that the two strings should be concatenated(what we will have as the filePath is poster/fileName)
         String filePath = path + File.separator + fileName;
 
         // Next we would create a file object and copy the file to the path

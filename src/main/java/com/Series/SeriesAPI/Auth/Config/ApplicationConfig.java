@@ -17,7 +17,6 @@ public class ApplicationConfig {
 
     private final UserRepository userRepository;
 
-
     public ApplicationConfig(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
@@ -34,8 +33,8 @@ public class ApplicationConfig {
     public AuthenticationProvider authenticationProvider(){
 
         // handles the authentication for the returned DAO userDetailsService above
-        // the DAO is like a container with name user, that has in all the user objects.
-        // in this case the book is accessed with the username of the book(from the username of the book, you can get other features of the book like email, password etc. )
+        // the DAO is like a book with name user, that has in it all the user objects.
+        // in this case the book is accessed with the username(email) of the book(from the username of the book, you can get other features of the book like email, password etc. )
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());

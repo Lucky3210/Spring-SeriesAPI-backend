@@ -31,7 +31,7 @@ public class AuthFilterService extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        // we want to get the access token, and we can do that from the http request headers(in this case Authorization)
+        // we want to get the access token, and we can do that from the http request headers(in this case Authorization). authHeader will be in the form(Bearer <accessToken>)
         final String authHeader = request.getHeader("Authorization");
         String jwt, username;
 
@@ -44,13 +44,13 @@ public class AuthFilterService extends OncePerRequestFilter {
         // if the token is present then we extract it
         jwt = authHeader.substring(7);      // the token will start from the 7th character after Bearer(Bearer is 6)
 
-        // extract username from jwt
+        // extract username(email) from jwt(accessToken)
         username = jwtService.extractUsername(jwt);
 
         // ensure username is not null and the user is not authenticated
         if((username != null) && SecurityContextHolder.getContext().getAuthentication() == null){
 
-            // if the username is valid but the user isn't authenticated, we need to load the user details(email) and valid the token
+            // if the username is valid but the user isn't authenticated, we need to load the user details(email) and validate the token
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if(jwtService.isTokenValid(jwt, userDetails)){
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -68,6 +68,6 @@ public class AuthFilterService extends OncePerRequestFilter {
             }
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response);    // allow the request
     }
 }
