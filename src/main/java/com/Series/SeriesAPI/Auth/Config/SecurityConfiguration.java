@@ -33,7 +33,7 @@ public class SecurityConfiguration{
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable) // used to disable csrf
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**")
+                        .requestMatchers("/api/v1/auth/**", "/forgotPassword/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
