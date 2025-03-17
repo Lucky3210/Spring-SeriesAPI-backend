@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/forgot-password")
+@RequestMapping("/forgotPassword")
 public class ForgotPasswordController {
 
     private final UserRepository userRepository;
@@ -55,18 +56,33 @@ public class ForgotPasswordController {
                 .subject("Forgot Password OTP")
                 .build();
 
-        // Since we are sending the otp, we need to build it and save the otp in the forgot password db
-        ForgotPassword fp = ForgotPassword.builder()
-                .otp(otp)
-                .expirationTime(new Date(System.currentTimeMillis() + 70 * 1000))
-                .user(user)
-                .build();
+        // if the user want to request for another otp, we check if the user already has an otp before,
+        // so that we can generate a new one and update the db, else we get a sql duplicate entry exception
+        Optional<ForgotPassword> existingOtp = forgotPasswordRepository.findByUser(user);
+        if(existingOtp.isPresent()){
+
+            // Update existing OTP and expiration time
+            ForgotPassword forgotPassword = existingOtp.get();
+            forgotPassword.setOtp(otp);
+            forgotPassword.setExpirationTime(new Date(System.currentTimeMillis() + 70 * 10000));
+            forgotPasswordRepository.save(forgotPassword);
+        }
+        else {
+
+            // Since we are sending the otp, we need to build it and save the otp in the forgot password db
+            ForgotPassword fp = ForgotPassword.builder()
+                    .otp(otp)
+                    .expirationTime(new Date(System.currentTimeMillis() + 70 * 10000)) // (70 * 1000 is 1 min and 10 sec(1000mills = 1 sec. 1 sec * 70 sec = 70 sec, = 1 min and 10 sec))
+                    .user(user)
+                    .build();
+            // save the forgot password object(fp) into the db
+            forgotPasswordRepository.save(fp);
+        }
+
+
 
         // add emailService and send mail
         emailService.sendSimpleMessage(mailBody);
-
-        // save the forgot password object(fp) into the db
-        forgotPasswordRepository.save(fp);
 
         return ResponseEntity.ok("Email sent for verification");
     }

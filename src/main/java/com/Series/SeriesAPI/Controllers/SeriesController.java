@@ -1,6 +1,9 @@
 package com.Series.SeriesAPI.Controllers;
 
 
+import com.Series.SeriesAPI.Auth.Entities.User;
+import com.Series.SeriesAPI.Auth.Repository.UserRepository;
+import com.Series.SeriesAPI.DTO.ResetPassword;
 import com.Series.SeriesAPI.DTO.SeriesDto;
 import com.Series.SeriesAPI.DTO.SeriesPageResponse;
 import com.Series.SeriesAPI.Exceptions.EmptyFileException;
@@ -11,20 +14,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/series")
 public class SeriesController {
 
     private final SeriesService seriesService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public SeriesController(SeriesService seriesService) {
+    public SeriesController(SeriesService seriesService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.seriesService = seriesService;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Convert the string of seriesDto to a JSON object, we use the objectMapper which is part of the jackson library
@@ -98,5 +108,37 @@ public class SeriesController {
             @RequestParam(defaultValue = AppConstant.SORT_DIR, required = false) String direction){
 
         return ResponseEntity.ok(seriesService.getAllSeriesWithPaginationAndSorting(pageNumber, pageSize, sortBy, direction));
+    }
+
+    @PostMapping("/resetPassword/{email}")
+    public ResponseEntity<String> resetPassword(
+            @PathVariable String email,
+            @RequestBody ResetPassword resetPassword
+    ){
+
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new UsernameNotFoundException("You must be logged in"));
+
+        // verify that the inputted oldPassword is actually the password in the db
+        // we use the matches method(the first argument is raw password, then the second is encoded)
+        boolean passwordMatch = passwordEncoder.matches(resetPassword.oldPassword(), user.getPassword());
+
+        // if password doesn't match we return a message to the user
+        if(!passwordMatch) {
+            return new ResponseEntity<>("Old password is incorrect", HttpStatus.EXPECTATION_FAILED);
+        }
+
+        // if the new password and the repeated one are not the same we also return a message.
+        if(!Objects.equals(resetPassword.newPassword(), resetPassword.repeatNewPassword())){
+            return new ResponseEntity<>("New Password and repeat New Password Mismatch..", HttpStatus.EXPECTATION_FAILED);
+        }
+
+        // If all being equal and true, we need to encode the password and then save it to the user object gotten from the email
+        String encodedNewPassword = passwordEncoder.encode(resetPassword.newPassword());
+        user.setPassword(encodedNewPassword);
+
+        // save user to User repo and return good.
+        userRepository.save(user);
+        return ResponseEntity.ok("Password Resetted successfully");
     }
 }
